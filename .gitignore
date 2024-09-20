@@ -1,0 +1,30 @@
+# Ignore Unity specific cache and metadata files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+
+# Avoid uploading auto-generated project settings
+/Assets/Plugins/Editor/JetBrains*
+/ProjectSettings/EditorPluginSettings.asset
+/ProjectSettings/ProjectVersion.txt
+/ProjectSettings/UnityConnectSettings.asset
+
+# Avoid uploading files related to personal preferences
+.vscode/
+/.idea/
+/*.csproj
+/*.unityproj
+/*.sln
+/*.suo
+/*.tmp
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
