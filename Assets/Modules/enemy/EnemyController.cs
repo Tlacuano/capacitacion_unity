@@ -18,15 +18,20 @@ public class EnemyController : MonoBehaviour
     private Quaternion _lookRotation;
     private float _grade;
     private float _cronometer;
+    private Vector3 _moveDirection; // Vector para la dirección del movimiento
+
 
     // Rango de visión del enemigo
     [SerializeField] private float _visionRange = 10f; // Rango de visión
-    [SerializeField] private float _visionAngle = 60f; // Ángulo del cono de visión
+    [SerializeField] private float _visionAngle = 180f; // Ángulo del cono de visión
 
     // estados
     private bool _playerDetected = false;
     private Transform _playerTransform;
-    
+
+
+    public Animator moster;
+
 
     // Start is called before the first frame update
     void Start()
@@ -38,7 +43,8 @@ public class EnemyController : MonoBehaviour
     void Update()
     {
         DetectPlayer(); // Detectar al jugador
-        
+        ApplyGravity();
+
         // Si el jugador es detectado, el enemigo se mueve hacia el jugador
         if (_playerDetected)
         {
@@ -48,6 +54,7 @@ public class EnemyController : MonoBehaviour
         {
             normalMovement();
         }
+
     }
 
     private void InitializeEnemy()
@@ -70,13 +77,19 @@ public class EnemyController : MonoBehaviour
         switch (_runtineMovement)
         {
             case 0:
+                moster.SetTrigger("NoCamina");
+                Debug.Log("NO está caminando");
                 break;
             case 1:
+                Debug.Log("SI está caminando");
+                moster.SetTrigger("Camina");
                 _grade = Random.Range(0, 360);
                 _lookRotation = Quaternion.Euler(0, _grade, 0);
                 _runtineMovement = 2;
+                
                 break;
             case 2:
+                Debug.Log("Está en un obstaculo");
                 // Comprobar si hay un obstáculo frente al enemigo
                 if (IsObstacleInFront())
                 {
@@ -103,7 +116,7 @@ public class EnemyController : MonoBehaviour
         return false; // No hay obstáculos
     }
 
-    // TODO: Implementar la paqueteria de IA para que esquibe por si sola las paredes y en caso de perder al jugador lo busque en la ultima posicion conocida
+    // TODO: Implementar la paqueteria de IA para que esquibe por si sola las paredes y en caso de perder al jugador lo busque en la ultima posicion conocida por 7 segundos
 
     // detectar al jugador
     private void DetectPlayer()
@@ -122,6 +135,10 @@ public class EnemyController : MonoBehaviour
                 // No hay obstáculos, jugador detectado
                 _playerDetected = true;
             }
+            else
+            {
+                _playerDetected = false;
+            }
         }
         else
         {
@@ -137,5 +154,22 @@ public class EnemyController : MonoBehaviour
         transform.LookAt(new Vector3(_playerTransform.position.x, transform.position.y, _playerTransform.position.z)); // Enfocar hacia el jugador
     }
 
-    
+    private void ApplyGravity()
+    {
+        if (!_characterController.isGrounded)
+        {
+            // Aplicamos la gravedad en el eje Y (hacia abajo)
+            _moveDirection.y -= _GRAVITY * Time.deltaTime;
+        }
+        else
+        {
+            // Si está en el suelo, reiniciamos la fuerza de caída
+            _moveDirection.y = -1f; // Mantenerlo "pegado" al suelo, con una leve fuerza hacia abajo
+        }
+
+        // Aplicamos el movimiento (incluyendo el componente de gravedad)
+        _characterController.Move(_moveDirection * Time.deltaTime);
+    }
+
+
 }
